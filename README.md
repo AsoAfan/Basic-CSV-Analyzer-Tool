@@ -19,7 +19,7 @@ A Python tool for analyzing and visualizing numerical data from CSV files. It al
 
 1. **Clone the repository**:
     ```bash
-    git clone https://github.com/yourusername/csv-analyzer.git
+    git clone https://github.com/AsoAfan/Basic-CSV-Analyzer-Tool.git
     cd csv-analyzer
     ```
 
