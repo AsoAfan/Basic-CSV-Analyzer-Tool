@@ -24,7 +24,6 @@ def plot_graph(ax, data: pd.Series, column: str, color: str, graph_type: str):
 
     elif graph_type == "Pie Chart":
         top_10 = data.value_counts().nlargest(10)
-        print(top_10[36])
         ax.pie(top_10, labels=top_10.index, colors=[color] * len(top_10), autopct="%1.1f%%")
         ax.set_title(f"Pie Chart of top 10 {column}s")
 
