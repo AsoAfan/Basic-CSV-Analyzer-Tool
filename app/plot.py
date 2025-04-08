@@ -3,11 +3,11 @@ import pandas as pd
 
 def plot_graph(ax, data: pd.Series, column: str, color: str, graph_type: str):
     if graph_type == "Histogram":
-        ax.hist(data, bins=20, alpha=0.7, color=color, edgecolor='black')
+        ax.hist(data, color=color, edgecolor='black')
         ax.set_title(f"Histogram of {column}")
 
     elif graph_type == "Box Plot":
-        ax.boxplot(data, patch_artist=True, boxprops=dict(facecolor=color))
+        ax.boxplot(data)
         ax.set_title(f"Box Plot of {column}")
 
     elif graph_type == "Scatter Plot":

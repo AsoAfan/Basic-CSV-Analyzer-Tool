@@ -11,7 +11,6 @@ A Python tool for analyzing and visualizing numerical data from CSV files. It al
 - **Graph Visualization**: Display different types of graphs like histogram, box plot, scatter plot, etc.
 - **CSV Generator**: Generate a new CSV with user-defined columns and random data.
 - **Color Customization**: Choose the color for the charts.
-- **Responsive Design**: The GUI adjusts dynamically for a better user experience.
 
 ---
 
@@ -20,7 +19,7 @@ A Python tool for analyzing and visualizing numerical data from CSV files. It al
 1. **Clone the repository**:
     ```bash
     git clone https://github.com/AsoAfan/Basic-CSV-Analyzer-Tool.git
-    cd csv-analyzer
+    cd Basic-CSV-Analyzer-Tool
     ```
 
 2. **Install dependencies**:
@@ -70,16 +69,21 @@ The CSV Generator allows you to create a CSV with random data.
 ## **Directory Structure**
 
 ```
-csv_analyzer/
-│── main.py              # Entry point to run the application
-│── gui.py               # Handles the graphical interface
-│── stats.py             # Computes basic statistical calculations
-│── plot.py              # Contains functions to plot different graphs
-│── utils.py             # Utility functions like loading CSV
-│── csv_generator.py     # Handles CSV generation from random data
-│── requirements.txt     # Dependencies for the project
-```
+Basic-CSV-Analyzer-Tool/
+├── app/                      # Main application code
+│   ├── gui.py                # GUI-related logic using CustomTkinter
+│   ├── stats.py              # Statistical data processing (Mean, Mode, etc.)
+│   ├── plot.py               # Graphing and plotting logic
+│   ├── utils.py              # Utility functions used across the app
+│   └── csv_generator.py      # CSV generation and random data functionality
+├── data/                     # Data files (can store sample or user-uploaded CSVs)
+│   └── simple_data.csv       # Sample CSV data file
+├── main.py                   # Entry point to run the application
+├── requirements.txt          # List of Python dependencies
+├── .gitignore                # Git ignore file to exclude unnecessary files
+└── Readme.md                 # Project documentation and instructions
 
+```
 ---
 
 ## **Requirements**

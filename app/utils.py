@@ -21,3 +21,4 @@ def run_if_value_exists(value, callback: Callable):
 
 def set_appearance_mode(value: str):
     customtkinter.set_appearance_mode(value)
+

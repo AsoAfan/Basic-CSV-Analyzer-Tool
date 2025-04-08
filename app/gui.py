@@ -1,20 +1,19 @@
-from tkinter import ttk
 from tkinter import filedialog, messagebox
 import customtkinter as ctk
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from pandas import DataFrame
-from csv_generator import CSVGenerator
-from plot import plot_graph
-from stats import compute_statistics
-from utils import load_csv, set_appearance_mode
+from app.csv_generator import CSVGenerator
+from app.plot import plot_graph
+from app.stats import compute_statistics
+from app.utils import load_csv, set_appearance_mode
 
 
 class CSVAnalyzerApp:
     def __init__(self, root, ):
 
-        self.df: DataFrame = None
+        self.df: DataFrame|None = None
         self.table_header_row = None
         self.root = root
         self.root.title("CSV Analyzer")
@@ -23,6 +22,9 @@ class CSVAnalyzerApp:
 
         self.headers = []
         self.rows = []
+
+        self.current_page = 0
+        self.rows_per_page = 25
 
         # SIDEBAR - START
         self.sidebar = ctk.CTkFrame(root, width=220, corner_radius=10)
@@ -64,6 +66,7 @@ class CSVAnalyzerApp:
         self.main_frame = ctk.CTkFrame(root, corner_radius=24)
         self.main_frame.pack(side="left", expand=True, fill="both", padx=10, pady=10)
 
+
         self.tab_view = ctk.CTkTabview(self.main_frame, fg_color="transparent", corner_radius=4)
         self.tab_view.pack( fill="both", expand=True, ipadx=10, ipady=10)
         self.tab_view.add("main")
@@ -75,7 +78,6 @@ class CSVAnalyzerApp:
         self.table_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
 
-        # Inside your class or method
 
         self.table_header_row = ctk.CTkFrame(self.table_frame)
         self.table_header_row.pack(fill="x", anchor="n", padx=12, pady=10)
@@ -83,8 +85,21 @@ class CSVAnalyzerApp:
         self.scrollable_frame = ctk.CTkScrollableFrame(self.table_frame)
         self.scrollable_frame.pack(fill="both", expand=True)
 
-        self.lab = ctk.CTkLabel(self.tab_view.tab("table"), text="Table view will be implemented soon!")
-        self.lab.pack(side="top")
+        self.pagination_frame = ctk.CTkFrame(self.table_frame)
+        self.pagination_frame.pack(fill="x", pady=5)
+
+        self.pagination_frame.grid_columnconfigure((0, 1, 2), weight=1)
+        self.pagination_frame.grid_rowconfigure(0)
+
+        self.prev_btn = ctk.CTkButton(self.pagination_frame, text="Previous", command=self.show_previous_page)
+        self.prev_btn.grid(row=0, column=0, sticky="w", padx=20)
+
+        self.page_label = ctk.CTkLabel(self.pagination_frame, text="Page 1")
+        self.page_label.grid(row=0, column=1, sticky="nsew")
+
+        self.next_btn = ctk.CTkButton(self.pagination_frame, text="Next", command=self.show_next_page)
+        self.next_btn.grid(row=0, column=2, sticky="e", padx=20)
+
         # TABLE_TAB - END
 
         # Stats frame - START
@@ -166,7 +181,6 @@ class CSVAnalyzerApp:
             label.grid(row=0, column=col_index, padx=10, pady=5, sticky="nsew")
             self.headers.append(label)
 
-        # Make columns expand equally
         for col_index in range(len(numerical_columns)):
             self.table_header_row.grid_columnconfigure(col_index, weight=1)
         self.column_dropdown.configure(values=numerical_columns)
@@ -174,35 +188,10 @@ class CSVAnalyzerApp:
 
         print(self.df.values)
 
-        for row in self.rows:
-            row.destroy()
 
-        for row_index, data_row in enumerate(self.df.values):
-            row_frame = ctk.CTkFrame(self.scrollable_frame)
-            row_frame.pack(fill="x", expand=True, padx=10, pady=5)
-            self.rows.append(row_frame)
 
-            for col_index, cell in enumerate(data_row):
-                label = ctk.CTkLabel(
-                    row_frame,
-                    text=cell,
-                    anchor="center",
-                    justify="center",
-                    width=100
-                )
-                label.grid(row=0, column=col_index, padx=10, pady=5, sticky="nsew")
-
-            # Let each column expand equally within this row
-            for col_index in range(len(data_row)):
-                row_frame.grid_columnconfigure(col_index, weight=1)
-
-        # for row_index, row in enumerate(self.df.values):
-        #     row_frame = ctk.CTkFrame(self.table_frame)
-        #     row_frame.pack(fill="x", expand=True, padx=10, pady=10)
-        #     for data in row:
-        #         print(f"row {row_index}: {data}")
-        #         row_label = ctk.CTkLabel(row_frame,text=data, anchor="center", justify="center", width=100)
-        #         row_label.pack(expand=True, padx=10, pady=10)
+        self.current_page = 0
+        self.show_page(self.current_page)
 
 
         messagebox.showinfo("Success", "CSV file loaded successfully.")
@@ -226,6 +215,9 @@ class CSVAnalyzerApp:
             messagebox.showerror("Error", "Selected column has no valid data.")
             return
 
+        self.tab_view.set("main")
+
+
         stats_text = compute_statistics(data)
         self.stats_text.delete("0.0", "end")
         self.stats_text.insert("0.0", stats_text)
@@ -237,96 +229,66 @@ class CSVAnalyzerApp:
     def open_csv_generator(self):
         if self.csv_generator is None:
             self.csv_generator = CSVGenerator(self.root)
-        self.csv_generator.show()
+        else:
+            try:
+                self.csv_generator.show()
+            except Exception:
+                self.csv_generator = CSVGenerator(self.root)
 
-    def show_data_table(self):
+    def show_page(self, page_num):
         if self.df is None:
-            messagebox.showerror("Error", "No CSV file loaded.")
             return
 
-        data_window = ctk.CTkToplevel(self.root)
-
-
-        data_window.title("CSV Data Viewer")
-        data_window.geometry("800x500")
-
-        # Treeview (table)
-
-        tree = ttk.Treeview(data_window, show="headings")
-        style = ttk.Style()
-        style.theme_use("default")
-
-        # General style
-        style.configure("Treeview",
-                        background="#1a1a1a",
-                        foreground="white",
-                        rowheight=28,
-                        fieldbackground="#1a1a1a",
-                        font=("Segoe UI", 12))
-
-        # Heading style
-        style.configure("Treeview.Heading",
-                        background="#333333",
-                        foreground="white",
-                        font=("Segoe UI", 13, "bold"))
-
-        # Selected row
-        style.map("Treeview",
-                  background=[("selected", "#3a7bd5")],
-                  foreground=[("selected", "white")])
-
-        # Alternating row colors
-        tree.tag_configure("oddrow", background="#1a1a1a")
-        tree.tag_configure("evenrow", background="#262626")
-
-        tree.pack(expand=True, fill="both", padx=10, pady=10)
-
-        # Pagination controls
-        pagination_frame = ctk.CTkFrame(data_window)
-        pagination_frame.pack(pady=5)
-
-        rows_per_page = 25
         total_rows = len(self.df)
-        total_pages = (total_rows + rows_per_page - 1) // rows_per_page
-        current_page = ctk.IntVar(value=0)
+        start = page_num * self.rows_per_page
+        end = start + self.rows_per_page
 
-        def load_page(page):
-            nonlocal current_page
-            current_page.set(page)
+        for row in self.rows:
+            row.destroy()
+        self.rows.clear()
 
-            tree.delete(*tree.get_children())
-            start_idx = page * rows_per_page
-            end_idx = min(start_idx + rows_per_page, total_rows)
+        for index in range(start, min(end, total_rows)):
+            data_row = self.df.iloc[index]
+            row_frame = ctk.CTkFrame(self.scrollable_frame)
+            row_frame.pack(fill="x", expand=True, padx=10, pady=5)
+            self.rows.append(row_frame)
 
-            if not tree["columns"]:
-                tree["columns"] = list(self.df.columns)
-                for col in self.df.columns:
-                    tree.heading(col, text=col)
-                    tree.column(col, width=100, anchor="center")
+            for col_index, cell in enumerate(data_row):
+                label = ctk.CTkLabel(
+                    row_frame,
+                    text=cell,
+                    anchor="center",
+                    justify="center",
+                    width=100
+                )
+                label.grid(row=0, column=col_index, padx=10, pady=5, sticky="nsew")
 
-            for i in range(start_idx, end_idx):
-                values = list(self.df.iloc[i])
-                tag = "evenrow" if i % 2 == 0 else "oddrow"
-                tree.insert("", "end", values=values, tags=(tag,))
+            for col_index in range(len(data_row)):
+                row_frame.grid_columnconfigure(col_index, weight=1)
 
-            page_label.configure(text=f"Page {page + 1} of {total_pages}")
+        self.page_label.configure(text=f"Page {page_num + 1}")
 
-        def prev_page():
-            if current_page.get() > 0:
-                load_page(current_page.get() - 1)
+        if total_rows <= self.rows_per_page:
+            self.pagination_frame.pack_forget()
+        else:
+            self.pagination_frame.pack(fill="x", pady=5)
+            self.prev_btn.grid_forget()
+            self.next_btn.grid_forget()
 
-        def next_page():
-            if current_page.get() < total_pages - 1:
-                load_page(current_page.get() + 1)
+            if page_num > 0:
+                self.prev_btn.grid(row=0, column=0, padx=10)
 
-        prev_btn = ctk.CTkButton(pagination_frame, text="Previous", command=prev_page)
-        prev_btn.pack(side="left", padx=5)
+            if end < total_rows:
+                self.next_btn.grid(row=0, column=2, padx=10)
 
-        page_label = ctk.CTkLabel(pagination_frame, text="")
-        page_label.pack(side="left", padx=5)
+    def show_next_page(self):
+        if self.df is not None and (self.current_page + 1) * self.rows_per_page < len(self.df):
+            self.current_page += 1
+            self.show_page(self.current_page)
 
-        next_btn = ctk.CTkButton(pagination_frame, text="Next", command=next_page)
-        next_btn.pack(side="left", padx=5)
+    def show_previous_page(self):
+        if self.current_page > 0:
+            self.current_page -= 1
+            self.show_page(self.current_page)
 
-        load_page(0)
 
