@@ -96,10 +96,6 @@ Basic-CSV-Analyzer-Tool/
 
 ---
 
-Sure! Here's a refined **Contribution** section for your README that includes a friendly note about the app not being error-free:
-
----
-
 ## **Contribution**
 
 We welcome contributions to help make this project better!
