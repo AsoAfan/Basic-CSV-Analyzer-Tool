@@ -93,3 +93,41 @@ Basic-CSV-Analyzer-Tool/
 - **Pandas**: For data manipulation and statistics calculations.
 - **Matplotlib**: For plotting graphs.
 - **CustomTkinter**: For an improved and beautiful UI.
+
+---
+
+Sure! Here's a refined **Contribution** section for your README that includes a friendly note about the app not being error-free:
+
+---
+
+## **Contribution**
+
+We welcome contributions to help make this project better!
+
+While we've worked hard to build a functional and user-friendly app, it may **not be completely error-free**. If you come across any bugs or issues, or have ideas for improvements, your input is greatly appreciated!
+
+### **How to Contribute**
+1. **Fork** the repository  
+2. **Clone** your fork locally:  
+   ```bash
+   git clone https://github.com/your-username/your-repo-name.git
+   ```
+3. Create a **new branch** for your changes:  
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+4. Make your changes and commit with clear, concise messages  
+5. **Push** your branch and open a **pull request**
+
+### **Contribution Guidelines**
+- Keep pull requests focused and descriptive
+- Include screenshots or descriptions if you’re changing the UI
+- Test your changes before submitting
+
+### **Found a Bug or Have an Idea?**
+- Open an issue to report a bug, suggest a feature, or ask a question
+- Contributions big or small are all welcome!
+
+---
+
+Happy coding 🥰
