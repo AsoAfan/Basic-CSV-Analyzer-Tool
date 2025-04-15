@@ -1,4 +1,5 @@
 import random
+import time
 from tkinter import messagebox
 
 import customtkinter as ctk
@@ -25,7 +26,8 @@ class CSVGenerator:
         self.generate_btn.pack(pady=10, padx=10)
 
     def show(self):
-        self.window.deiconify()
+            self.window.deiconify()
+
 
     def generate_csv(self):
         column_names = self.column_entry.get().split(",")
@@ -38,13 +40,14 @@ class CSVGenerator:
             return
 
         self.progress_label.configure(text="Generating CSV... Please wait.")
-
         self.window.update_idletasks()
 
         data = {col.strip(): [random.randint(1, 100) for _ in range(num_rows)] for col in column_names}
+
+        data = {"#": list(range(1, num_rows + 1)), **data}
+
         df = pd.DataFrame(data)
-        file_path = "generated_data.csv"
+        file_path = "data/generated_data_" + time.strftime("%Y_%m_%d_%H_%M_%p") + ".csv"
         df.to_csv(file_path, index=False)
 
         self.progress_label.configure(text=f"CSV saved: {file_path}")
-        # messagebox.showinfo("Success", f"CSV saved as {file_path}")

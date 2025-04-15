@@ -1,6 +1,6 @@
 import customtkinter as ctk
 
-from gui import CSVAnalyzerApp
+from app.gui import CSVAnalyzerApp
 
 if __name__ == "__main__":
     ctk.set_appearance_mode("system")
